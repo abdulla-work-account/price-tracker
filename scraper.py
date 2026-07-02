@@ -74,7 +74,7 @@ def fetch_page(url: str, render: bool = True) -> str:
         "url": url,
         "country_code": "us",
         "render": "true",
-        "premium": "true",   # premium proxies - see note below about your plan
+        "ultra_premium": "true",   # premium proxies - see note below about your plan
     }
     response = requests.get(SCRAPERAPI_ENDPOINT, params=params, timeout=120)
     if response.status_code != 200:
