@@ -77,7 +77,11 @@ def fetch_page(url: str, render: bool = True) -> str:
         "premium": "true",   # premium proxies - see note below about your plan
     }
     response = requests.get(SCRAPERAPI_ENDPOINT, params=params, timeout=120)
-    response.raise_for_status()
+    response = requests.get(SCRAPERAPI_ENDPOINT, params=params, timeout=120)
+if response.status_code != 200:
+    print(f"  ScraperAPI returned {response.status_code}. Body: {response.text[:500]}")
+response.raise_for_status()
+return response.text
     return response.text
 
 
