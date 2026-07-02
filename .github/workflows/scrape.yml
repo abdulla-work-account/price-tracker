@@ -1,0 +1,44 @@
+name: Daily Chewy Price Scrape
+
+on:
+  schedule:
+    # Runs every day at 11:00 UTC (7:00 AM Eastern during daylight saving).
+    # Edit the cron line to change the time. Format: minute hour * * *
+    - cron: "0 11 * * *"
+  workflow_dispatch: {}   # Adds the manual "Run workflow" button in the Actions tab
+
+permissions:
+  contents: write          # Lets this workflow commit data.csv back to the repo
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 lxml
+
+      - name: Run the scraper
+        env:
+          SCRAPERAPI_KEY: ${{ secrets.SCRAPERAPI_KEY }}
+        run: python scraper.py
+
+      - name: Commit and push updated data.csv
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.csv
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Daily price data: $(date -u +'%Y-%m-%d')"
+            git pull --rebase origin main
+            git push
+          fi
