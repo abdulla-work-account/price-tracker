@@ -42,7 +42,7 @@ from bs4 import BeautifulSoup
 # ---------------------------------------------------------------------------
 TARGET_URLS = [
     "https://www.chewy.com/hills-science-diet-adult-sensitive/dp/34037",
-    "https://www.chewy.com/hills-science-diet-adult-chicken/dp/EXAMPLE-REPLACE-ME",
+    "https://www.chewy.com/hills-science-diet-adult-sensitive/dp/120100",
 ]
 
 RETAILER_NAME = "Chewy"
