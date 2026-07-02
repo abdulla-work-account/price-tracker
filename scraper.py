@@ -66,13 +66,16 @@ SIZE_PATTERN = re.compile(
 )
 
 
-def fetch_page(url: str, render: bool = False) -> str:
-    """Fetch through ScraperAPI. render=True runs JavaScript (more credits);
-    the sample page shows the buy box is present in the plain HTML, so the
-    cheap request should normally be enough."""
-    params = {"api_key": API_KEY, "url": url, "country_code": "us"}
-    if render:
-        params["render"] = "true"
+def fetch_page(url: str, render: bool = True) -> str:
+    """Fetch through ScraperAPI with JS rendering on by default, since Chewy's
+    anti-bot usually rejects plain requests."""
+    params = {
+        "api_key": API_KEY,
+        "url": url,
+        "country_code": "us",
+        "render": "true",
+        "premium": "true",   # premium proxies - see note below about your plan
+    }
     response = requests.get(SCRAPERAPI_ENDPOINT, params=params, timeout=120)
     response.raise_for_status()
     return response.text
@@ -204,16 +207,8 @@ def error_row(url: str) -> dict:
 
 
 def scrape_one(url: str) -> dict:
-    html = fetch_page(url, render=False)
-    row = parse_product(html, url)
-    if (
-        row["Product Name"] == "Error - Check Page"
-        or row["Retail Price (One-Time)"] == "Error - Check Page"
-    ):
-        print(f"  Plain fetch incomplete, retrying with JS rendering: {url}")
-        html = fetch_page(url, render=True)
-        row = parse_product(html, url)
-    return row
+    html = fetch_page(url)
+    return parse_product(html, url)
 
 
 def append_rows(rows: list[dict]) -> None:
